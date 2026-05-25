@@ -73,10 +73,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "codelab — your college's coding home" },
+      { title: "nexcode-ai — your college's coding home" },
       { name: "description", content: "Internal coding assessment platform for students and faculty." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "codelab — your college's coding home" },
+      { property: "og:title", content: "nexcode-ai — your college's coding home" },
       { property: "og:description", content: "Internal coding assessment platform for students and faculty." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

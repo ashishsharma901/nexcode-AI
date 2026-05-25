@@ -35,7 +35,7 @@ function Index() {
       <div className="flex items-center justify-center px-8 py-16">
         <div className="w-full max-w-sm">
           <div className="mb-12">
-            <div className="font-serif text-xl text-foreground">codelab</div>
+            <div className="font-serif text-xl text-foreground">nexcode-ai</div>
             <div className="mt-1 text-xs text-muted-foreground">your college's coding home</div>
           </div>
           <h1 className="font-serif text-5xl leading-tight text-foreground">Welcome back.</h1>
@@ -64,16 +64,26 @@ function Index() {
             >
               Sign in
             </Link>
-            <div className="text-center">
-              <button type="button" className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">
+            <div className="text-center space-y-2">
+              <button type="button" className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline block w-full">
                 or continue with Google
               </button>
+              <div className="text-xs text-muted-foreground">
+                Don't have an account?{" "}
+                <Link to="/register" className="text-primary hover:underline font-medium">
+                  Create one →
+                </Link>
+              </div>
             </div>
           </form>
 
-          <div className="mt-16 flex items-center justify-between text-xs text-muted-foreground">
-            <span>© codelab</span>
-            <Link to="/teacher" className="hover:text-foreground">Faculty sign in →</Link>
+          <div className="mt-16 flex items-center justify-between text-xs text-muted-foreground border-t border-border/50 pt-6">
+            <span>© nexcode-ai</span>
+            <div className="flex gap-4">
+              <Link to="/teacher" className="hover:text-foreground transition-colors">Faculty desk</Link>
+              <span className="text-border">|</span>
+              <Link to="/admin" className="hover:text-foreground transition-colors">Admin panel</Link>
+            </div>
           </div>
         </div>
       </div>
