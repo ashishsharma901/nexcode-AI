@@ -9,38 +9,186 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TeacherRouteImport } from './routes/teacher'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as ProblemsRouteImport } from './routes/problems'
+import { Route as ProblemRouteImport } from './routes/problem'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ContestRouteImport } from './routes/contest'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TeacherPlagiarismRouteImport } from './routes/teacher.plagiarism'
+import { Route as TeacherNewRouteImport } from './routes/teacher.new'
 
+const TeacherRoute = TeacherRouteImport.update({
+  id: '/teacher',
+  path: '/teacher',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProblemsRoute = ProblemsRouteImport.update({
+  id: '/problems',
+  path: '/problems',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProblemRoute = ProblemRouteImport.update({
+  id: '/problem',
+  path: '/problem',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContestRoute = ContestRouteImport.update({
+  id: '/contest',
+  path: '/contest',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TeacherPlagiarismRoute = TeacherPlagiarismRouteImport.update({
+  id: '/plagiarism',
+  path: '/plagiarism',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const TeacherNewRoute = TeacherNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => TeacherRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/contest': typeof ContestRoute
+  '/dashboard': typeof DashboardRoute
+  '/problem': typeof ProblemRoute
+  '/problems': typeof ProblemsRoute
+  '/profile': typeof ProfileRoute
+  '/teacher': typeof TeacherRouteWithChildren
+  '/teacher/new': typeof TeacherNewRoute
+  '/teacher/plagiarism': typeof TeacherPlagiarismRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/contest': typeof ContestRoute
+  '/dashboard': typeof DashboardRoute
+  '/problem': typeof ProblemRoute
+  '/problems': typeof ProblemsRoute
+  '/profile': typeof ProfileRoute
+  '/teacher': typeof TeacherRouteWithChildren
+  '/teacher/new': typeof TeacherNewRoute
+  '/teacher/plagiarism': typeof TeacherPlagiarismRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/contest': typeof ContestRoute
+  '/dashboard': typeof DashboardRoute
+  '/problem': typeof ProblemRoute
+  '/problems': typeof ProblemsRoute
+  '/profile': typeof ProfileRoute
+  '/teacher': typeof TeacherRouteWithChildren
+  '/teacher/new': typeof TeacherNewRoute
+  '/teacher/plagiarism': typeof TeacherPlagiarismRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/contest'
+    | '/dashboard'
+    | '/problem'
+    | '/problems'
+    | '/profile'
+    | '/teacher'
+    | '/teacher/new'
+    | '/teacher/plagiarism'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/contest'
+    | '/dashboard'
+    | '/problem'
+    | '/problems'
+    | '/profile'
+    | '/teacher'
+    | '/teacher/new'
+    | '/teacher/plagiarism'
+  id:
+    | '__root__'
+    | '/'
+    | '/contest'
+    | '/dashboard'
+    | '/problem'
+    | '/problems'
+    | '/profile'
+    | '/teacher'
+    | '/teacher/new'
+    | '/teacher/plagiarism'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ContestRoute: typeof ContestRoute
+  DashboardRoute: typeof DashboardRoute
+  ProblemRoute: typeof ProblemRoute
+  ProblemsRoute: typeof ProblemsRoute
+  ProfileRoute: typeof ProfileRoute
+  TeacherRoute: typeof TeacherRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/teacher': {
+      id: '/teacher'
+      path: '/teacher'
+      fullPath: '/teacher'
+      preLoaderRoute: typeof TeacherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/problems': {
+      id: '/problems'
+      path: '/problems'
+      fullPath: '/problems'
+      preLoaderRoute: typeof ProblemsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/problem': {
+      id: '/problem'
+      path: '/problem'
+      fullPath: '/problem'
+      preLoaderRoute: typeof ProblemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contest': {
+      id: '/contest'
+      path: '/contest'
+      fullPath: '/contest'
+      preLoaderRoute: typeof ContestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +196,44 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/teacher/plagiarism': {
+      id: '/teacher/plagiarism'
+      path: '/plagiarism'
+      fullPath: '/teacher/plagiarism'
+      preLoaderRoute: typeof TeacherPlagiarismRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/teacher/new': {
+      id: '/teacher/new'
+      path: '/new'
+      fullPath: '/teacher/new'
+      preLoaderRoute: typeof TeacherNewRouteImport
+      parentRoute: typeof TeacherRoute
+    }
   }
 }
 
+interface TeacherRouteChildren {
+  TeacherNewRoute: typeof TeacherNewRoute
+  TeacherPlagiarismRoute: typeof TeacherPlagiarismRoute
+}
+
+const TeacherRouteChildren: TeacherRouteChildren = {
+  TeacherNewRoute: TeacherNewRoute,
+  TeacherPlagiarismRoute: TeacherPlagiarismRoute,
+}
+
+const TeacherRouteWithChildren =
+  TeacherRoute._addFileChildren(TeacherRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ContestRoute: ContestRoute,
+  DashboardRoute: DashboardRoute,
+  ProblemRoute: ProblemRoute,
+  ProblemsRoute: ProblemsRoute,
+  ProfileRoute: ProfileRoute,
+  TeacherRoute: TeacherRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
