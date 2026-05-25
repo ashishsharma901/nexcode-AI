@@ -10,15 +10,23 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TeacherRouteImport } from './routes/teacher'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ProblemsRouteImport } from './routes/problems'
 import { Route as ProblemRouteImport } from './routes/problem'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContestRouteImport } from './routes/contest'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TeacherPlagiarismRouteImport } from './routes/teacher.plagiarism'
+import { Route as TeacherNewRouteImport } from './routes/teacher.new'
 
 const TeacherRoute = TeacherRouteImport.update({
   id: '/teacher',
   path: '/teacher',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProblemsRoute = ProblemsRouteImport.update({
@@ -46,6 +54,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TeacherPlagiarismRoute = TeacherPlagiarismRouteImport.update({
+  id: '/plagiarism',
+  path: '/plagiarism',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const TeacherNewRoute = TeacherNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => TeacherRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -53,7 +71,10 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/problem': typeof ProblemRoute
   '/problems': typeof ProblemsRoute
-  '/teacher': typeof TeacherRoute
+  '/profile': typeof ProfileRoute
+  '/teacher': typeof TeacherRouteWithChildren
+  '/teacher/new': typeof TeacherNewRoute
+  '/teacher/plagiarism': typeof TeacherPlagiarismRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -61,7 +82,10 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/problem': typeof ProblemRoute
   '/problems': typeof ProblemsRoute
-  '/teacher': typeof TeacherRoute
+  '/profile': typeof ProfileRoute
+  '/teacher': typeof TeacherRouteWithChildren
+  '/teacher/new': typeof TeacherNewRoute
+  '/teacher/plagiarism': typeof TeacherPlagiarismRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -70,7 +94,10 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/problem': typeof ProblemRoute
   '/problems': typeof ProblemsRoute
-  '/teacher': typeof TeacherRoute
+  '/profile': typeof ProfileRoute
+  '/teacher': typeof TeacherRouteWithChildren
+  '/teacher/new': typeof TeacherNewRoute
+  '/teacher/plagiarism': typeof TeacherPlagiarismRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -80,9 +107,21 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/problem'
     | '/problems'
+    | '/profile'
     | '/teacher'
+    | '/teacher/new'
+    | '/teacher/plagiarism'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/contest' | '/dashboard' | '/problem' | '/problems' | '/teacher'
+  to:
+    | '/'
+    | '/contest'
+    | '/dashboard'
+    | '/problem'
+    | '/problems'
+    | '/profile'
+    | '/teacher'
+    | '/teacher/new'
+    | '/teacher/plagiarism'
   id:
     | '__root__'
     | '/'
@@ -90,7 +129,10 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/problem'
     | '/problems'
+    | '/profile'
     | '/teacher'
+    | '/teacher/new'
+    | '/teacher/plagiarism'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -99,7 +141,8 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   ProblemRoute: typeof ProblemRoute
   ProblemsRoute: typeof ProblemsRoute
-  TeacherRoute: typeof TeacherRoute
+  ProfileRoute: typeof ProfileRoute
+  TeacherRoute: typeof TeacherRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -109,6 +152,13 @@ declare module '@tanstack/react-router' {
       path: '/teacher'
       fullPath: '/teacher'
       preLoaderRoute: typeof TeacherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/problems': {
@@ -146,8 +196,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/teacher/plagiarism': {
+      id: '/teacher/plagiarism'
+      path: '/plagiarism'
+      fullPath: '/teacher/plagiarism'
+      preLoaderRoute: typeof TeacherPlagiarismRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/teacher/new': {
+      id: '/teacher/new'
+      path: '/new'
+      fullPath: '/teacher/new'
+      preLoaderRoute: typeof TeacherNewRouteImport
+      parentRoute: typeof TeacherRoute
+    }
   }
 }
+
+interface TeacherRouteChildren {
+  TeacherNewRoute: typeof TeacherNewRoute
+  TeacherPlagiarismRoute: typeof TeacherPlagiarismRoute
+}
+
+const TeacherRouteChildren: TeacherRouteChildren = {
+  TeacherNewRoute: TeacherNewRoute,
+  TeacherPlagiarismRoute: TeacherPlagiarismRoute,
+}
+
+const TeacherRouteWithChildren =
+  TeacherRoute._addFileChildren(TeacherRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -155,7 +232,8 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   ProblemRoute: ProblemRoute,
   ProblemsRoute: ProblemsRoute,
-  TeacherRoute: TeacherRoute,
+  ProfileRoute: ProfileRoute,
+  TeacherRoute: TeacherRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
