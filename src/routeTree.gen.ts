@@ -20,11 +20,17 @@ import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContestsRouteImport } from './routes/contests'
 import { Route as ContestRouteImport } from './routes/contest'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TeacherUploadRouteImport } from './routes/teacher.upload'
 import { Route as TeacherStudentsRouteImport } from './routes/teacher.students'
+import { Route as TeacherQuestionsRouteImport } from './routes/teacher.questions'
 import { Route as TeacherPlagiarismRouteImport } from './routes/teacher.plagiarism'
 import { Route as TeacherNewRouteImport } from './routes/teacher.new'
 import { Route as TeacherContestsRouteImport } from './routes/teacher.contests'
+import { Route as TeacherAnalyticsRouteImport } from './routes/teacher.analytics'
+import { Route as AdminTeachersRouteImport } from './routes/admin.teachers'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as TeacherContestsNewRouteImport } from './routes/teacher.contests.new'
 
 const TeacherRoute = TeacherRouteImport.update({
@@ -82,14 +88,29 @@ const ContestRoute = ContestRouteImport.update({
   path: '/contest',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TeacherUploadRoute = TeacherUploadRouteImport.update({
+  id: '/upload',
+  path: '/upload',
+  getParentRoute: () => TeacherRoute,
+} as any)
 const TeacherStudentsRoute = TeacherStudentsRouteImport.update({
   id: '/students',
   path: '/students',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const TeacherQuestionsRoute = TeacherQuestionsRouteImport.update({
+  id: '/questions',
+  path: '/questions',
   getParentRoute: () => TeacherRoute,
 } as any)
 const TeacherPlagiarismRoute = TeacherPlagiarismRouteImport.update({
@@ -107,6 +128,21 @@ const TeacherContestsRoute = TeacherContestsRouteImport.update({
   path: '/contests',
   getParentRoute: () => TeacherRoute,
 } as any)
+const TeacherAnalyticsRoute = TeacherAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const AdminTeachersRoute = AdminTeachersRouteImport.update({
+  id: '/teachers',
+  path: '/teachers',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
 const TeacherContestsNewRoute = TeacherContestsNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -115,6 +151,7 @@ const TeacherContestsNewRoute = TeacherContestsNewRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/contest': typeof ContestRoute
   '/contests': typeof ContestsRoute
   '/dashboard': typeof DashboardRoute
@@ -126,14 +163,20 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/settings': typeof SettingsRoute
   '/teacher': typeof TeacherRouteWithChildren
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/teachers': typeof AdminTeachersRoute
+  '/teacher/analytics': typeof TeacherAnalyticsRoute
   '/teacher/contests': typeof TeacherContestsRouteWithChildren
   '/teacher/new': typeof TeacherNewRoute
   '/teacher/plagiarism': typeof TeacherPlagiarismRoute
+  '/teacher/questions': typeof TeacherQuestionsRoute
   '/teacher/students': typeof TeacherStudentsRoute
+  '/teacher/upload': typeof TeacherUploadRoute
   '/teacher/contests/new': typeof TeacherContestsNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/contest': typeof ContestRoute
   '/contests': typeof ContestsRoute
   '/dashboard': typeof DashboardRoute
@@ -145,15 +188,21 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/settings': typeof SettingsRoute
   '/teacher': typeof TeacherRouteWithChildren
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/teachers': typeof AdminTeachersRoute
+  '/teacher/analytics': typeof TeacherAnalyticsRoute
   '/teacher/contests': typeof TeacherContestsRouteWithChildren
   '/teacher/new': typeof TeacherNewRoute
   '/teacher/plagiarism': typeof TeacherPlagiarismRoute
+  '/teacher/questions': typeof TeacherQuestionsRoute
   '/teacher/students': typeof TeacherStudentsRoute
+  '/teacher/upload': typeof TeacherUploadRoute
   '/teacher/contests/new': typeof TeacherContestsNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/contest': typeof ContestRoute
   '/contests': typeof ContestsRoute
   '/dashboard': typeof DashboardRoute
@@ -165,16 +214,22 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/settings': typeof SettingsRoute
   '/teacher': typeof TeacherRouteWithChildren
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/teachers': typeof AdminTeachersRoute
+  '/teacher/analytics': typeof TeacherAnalyticsRoute
   '/teacher/contests': typeof TeacherContestsRouteWithChildren
   '/teacher/new': typeof TeacherNewRoute
   '/teacher/plagiarism': typeof TeacherPlagiarismRoute
+  '/teacher/questions': typeof TeacherQuestionsRoute
   '/teacher/students': typeof TeacherStudentsRoute
+  '/teacher/upload': typeof TeacherUploadRoute
   '/teacher/contests/new': typeof TeacherContestsNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/contest'
     | '/contests'
     | '/dashboard'
@@ -186,14 +241,20 @@ export interface FileRouteTypes {
     | '/register'
     | '/settings'
     | '/teacher'
+    | '/admin/settings'
+    | '/admin/teachers'
+    | '/teacher/analytics'
     | '/teacher/contests'
     | '/teacher/new'
     | '/teacher/plagiarism'
+    | '/teacher/questions'
     | '/teacher/students'
+    | '/teacher/upload'
     | '/teacher/contests/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/contest'
     | '/contests'
     | '/dashboard'
@@ -205,14 +266,20 @@ export interface FileRouteTypes {
     | '/register'
     | '/settings'
     | '/teacher'
+    | '/admin/settings'
+    | '/admin/teachers'
+    | '/teacher/analytics'
     | '/teacher/contests'
     | '/teacher/new'
     | '/teacher/plagiarism'
+    | '/teacher/questions'
     | '/teacher/students'
+    | '/teacher/upload'
     | '/teacher/contests/new'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/contest'
     | '/contests'
     | '/dashboard'
@@ -224,15 +291,21 @@ export interface FileRouteTypes {
     | '/register'
     | '/settings'
     | '/teacher'
+    | '/admin/settings'
+    | '/admin/teachers'
+    | '/teacher/analytics'
     | '/teacher/contests'
     | '/teacher/new'
     | '/teacher/plagiarism'
+    | '/teacher/questions'
     | '/teacher/students'
+    | '/teacher/upload'
     | '/teacher/contests/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
   ContestRoute: typeof ContestRoute
   ContestsRoute: typeof ContestsRoute
   DashboardRoute: typeof DashboardRoute
@@ -325,6 +398,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -332,11 +412,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/teacher/upload': {
+      id: '/teacher/upload'
+      path: '/upload'
+      fullPath: '/teacher/upload'
+      preLoaderRoute: typeof TeacherUploadRouteImport
+      parentRoute: typeof TeacherRoute
+    }
     '/teacher/students': {
       id: '/teacher/students'
       path: '/students'
       fullPath: '/teacher/students'
       preLoaderRoute: typeof TeacherStudentsRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/teacher/questions': {
+      id: '/teacher/questions'
+      path: '/questions'
+      fullPath: '/teacher/questions'
+      preLoaderRoute: typeof TeacherQuestionsRouteImport
       parentRoute: typeof TeacherRoute
     }
     '/teacher/plagiarism': {
@@ -360,6 +454,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TeacherContestsRouteImport
       parentRoute: typeof TeacherRoute
     }
+    '/teacher/analytics': {
+      id: '/teacher/analytics'
+      path: '/analytics'
+      fullPath: '/teacher/analytics'
+      preLoaderRoute: typeof TeacherAnalyticsRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/admin/teachers': {
+      id: '/admin/teachers'
+      path: '/teachers'
+      fullPath: '/admin/teachers'
+      preLoaderRoute: typeof AdminTeachersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/teacher/contests/new': {
       id: '/teacher/contests/new'
       path: '/new'
@@ -369,6 +484,18 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AdminRouteChildren {
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminTeachersRoute: typeof AdminTeachersRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminTeachersRoute: AdminTeachersRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface TeacherContestsRouteChildren {
   TeacherContestsNewRoute: typeof TeacherContestsNewRoute
@@ -383,17 +510,23 @@ const TeacherContestsRouteWithChildren = TeacherContestsRoute._addFileChildren(
 )
 
 interface TeacherRouteChildren {
+  TeacherAnalyticsRoute: typeof TeacherAnalyticsRoute
   TeacherContestsRoute: typeof TeacherContestsRouteWithChildren
   TeacherNewRoute: typeof TeacherNewRoute
   TeacherPlagiarismRoute: typeof TeacherPlagiarismRoute
+  TeacherQuestionsRoute: typeof TeacherQuestionsRoute
   TeacherStudentsRoute: typeof TeacherStudentsRoute
+  TeacherUploadRoute: typeof TeacherUploadRoute
 }
 
 const TeacherRouteChildren: TeacherRouteChildren = {
+  TeacherAnalyticsRoute: TeacherAnalyticsRoute,
   TeacherContestsRoute: TeacherContestsRouteWithChildren,
   TeacherNewRoute: TeacherNewRoute,
   TeacherPlagiarismRoute: TeacherPlagiarismRoute,
+  TeacherQuestionsRoute: TeacherQuestionsRoute,
   TeacherStudentsRoute: TeacherStudentsRoute,
+  TeacherUploadRoute: TeacherUploadRoute,
 }
 
 const TeacherRouteWithChildren =
@@ -401,6 +534,7 @@ const TeacherRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
   ContestRoute: ContestRoute,
   ContestsRoute: ContestsRoute,
   DashboardRoute: DashboardRoute,

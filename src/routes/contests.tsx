@@ -184,7 +184,7 @@ function Contests() {
                   )}
                   {c.status === "past" && (
                     <Link
-                      to="/contest-review"
+                      to="/contest"
                       className="flex items-center justify-center gap-2 rounded-lg bg-secondary text-foreground py-2.5 text-xs font-bold hover:bg-muted transition-colors border border-border"
                     >
                       Review Performance

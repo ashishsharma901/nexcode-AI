@@ -10,6 +10,7 @@ import {
 
 import appCss from "../styles.css?url";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { AuthProvider } from "@/lib/auth-context";
 
 function NotFoundComponent() {
   return (
@@ -114,8 +115,10 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
-      <ThemeToggle />
+      <AuthProvider>
+        <Outlet />
+        <ThemeToggle />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

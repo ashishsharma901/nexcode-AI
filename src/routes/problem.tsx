@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Send, Sparkles, CheckCircle2, XCircle, AlertCircle, Play, Check } from "lucide-react";
-import { useState, useMemo } from "react";
+import { ArrowLeft, Send, Sparkles, CheckCircle2, XCircle, AlertCircle, Play, Check, Maximize2, Minimize2, Type } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
 
 export const Route = createFileRoute("/problem")({ component: ProblemPage });
 
@@ -24,16 +24,45 @@ class Solution:
         # TODO: Implement BFS from seen island coordinates
         return 0`;
 
+type Verdict = "AC" | "WA" | "TLE" | "MLE" | "CE" | "RE";
+
+interface TestCaseResult {
+  id: number;
+  verdict: Verdict;
+  input: string;
+  expected: string;
+  actual: string;
+  time: string;
+  memory: string;
+}
+
 function ProblemPage() {
   const [tab, setTab] = useState("problem");
   const [code, setCode] = useState(initialCode);
+  const [language, setLanguage] = useState("Python 3");
   const [showResults, setShowResults] = useState(false);
+  const [testResults, setTestResults] = useState<TestCaseResult[]>([]);
+  const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitResult, setSubmitResult] = useState<"success" | "fail" | null>(null);
+  const [submitResult, setSubmitResult] = useState<{ verdict: Verdict; details: string } | null>(null);
   const [hintLevel, setHintLevel] = useState(0);
   const [isGeneratingHint, setIsGeneratingHint] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [fontSize, setFontSize] = useState(13);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<"saved" | "saving" | "idle">("idle");
 
   const lines = useMemo(() => code.split("\n"), [code]);
+
+  // Auto-save simulation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (code !== initialCode) {
+        setAutoSaveStatus("saving");
+        setTimeout(() => setAutoSaveStatus("saved"), 800);
+      }
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [code]);
 
   const requestHint = () => {
     setIsGeneratingHint(true);
@@ -44,8 +73,17 @@ function ProblemPage() {
   };
 
   const handleRun = () => {
-    setShowResults(true);
+    setIsRunning(true);
     setSubmitResult(null);
+    setTimeout(() => {
+      setIsRunning(false);
+      setTestResults([
+        { id: 1, verdict: "AC", input: "grid = [[0,1],[1,0]]", expected: "1", actual: "1", time: "12 ms", memory: "14.2 MB" },
+        { id: 2, verdict: "AC", input: "grid = [[0,1,0],[0,0,0],[0,0,1]]", expected: "2", actual: "2", time: "15 ms", memory: "14.3 MB" },
+        { id: 3, verdict: "AC", input: "grid = [[1,1,0],[0,0,0],[0,0,1]]", expected: "2", actual: "2", time: "14 ms", memory: "14.1 MB" },
+      ]);
+      setShowResults(true);
+    }, 1200);
   };
 
   const handleSubmit = () => {
@@ -54,12 +92,22 @@ function ProblemPage() {
     setShowResults(false);
     setTimeout(() => {
       setIsSubmitting(false);
-      setSubmitResult("success");
-    }, 1500);
+      setSubmitResult({ verdict: "AC", details: "100/100 test cases passed" });
+    }, 2000);
+  };
+
+  const verdictColor: Record<Verdict, string> = {
+    AC: "text-success", WA: "text-danger", TLE: "text-warning",
+    MLE: "text-purple-500", CE: "text-orange-500", RE: "text-danger",
+  };
+
+  const verdictLabel: Record<Verdict, string> = {
+    AC: "Accepted", WA: "Wrong Answer", TLE: "Time Limit Exceeded",
+    MLE: "Memory Limit Exceeded", CE: "Compilation Error", RE: "Runtime Error",
   };
 
   return (
-    <div className="flex h-screen flex-col bg-background">
+    <div className={`flex h-screen flex-col bg-background ${isFullscreen ? "fixed inset-0 z-50" : ""}`}>
       <header className="flex h-12 items-center justify-between border-b border-border px-5">
         <div className="flex items-center gap-4">
           <Link to="/problems" className="text-muted-foreground hover:text-foreground">
@@ -70,25 +118,54 @@ function ProblemPage() {
             <span className="h-1.5 w-1.5 rounded-full bg-warning animate-pulse" /> Medium
           </span>
         </div>
-        <div className="flex items-center gap-4 text-sm">
-          <select className="bg-transparent border-0 text-xs text-muted-foreground hover:text-foreground outline-none cursor-pointer">
+        <div className="flex items-center gap-3 text-sm">
+          {/* Auto-save indicator */}
+          <span className="text-[10px] text-muted-foreground">
+            {autoSaveStatus === "saving" && "Saving..."}
+            {autoSaveStatus === "saved" && "✓ Draft saved"}
+          </span>
+
+          {/* Language selector */}
+          <select
+            value={language}
+            onChange={(e) => setLanguage(e.target.value)}
+            className="bg-transparent border border-border rounded-md px-2 py-1 text-xs text-foreground outline-none cursor-pointer"
+          >
             <option className="bg-popover text-foreground">Python 3</option>
             <option className="bg-popover text-foreground">C++20</option>
             <option className="bg-popover text-foreground">Java 17</option>
-            <option className="bg-popover text-foreground">Go 1.21</option>
+            <option className="bg-popover text-foreground">JavaScript</option>
           </select>
+
+          {/* Font size control */}
+          <div className="flex items-center gap-1 border border-border rounded-md">
+            <button onClick={() => setFontSize(Math.max(10, fontSize - 1))} className="px-1.5 py-1 text-xs text-muted-foreground hover:text-foreground cursor-pointer">A-</button>
+            <span className="text-[10px] text-muted-foreground w-5 text-center">{fontSize}</span>
+            <button onClick={() => setFontSize(Math.min(20, fontSize + 1))} className="px-1.5 py-1 text-xs text-muted-foreground hover:text-foreground cursor-pointer">A+</button>
+          </div>
+
+          {/* Fullscreen toggle */}
+          <button
+            onClick={() => setIsFullscreen(!isFullscreen)}
+            className="rounded-md border border-border p-1.5 text-muted-foreground hover:text-foreground cursor-pointer"
+            title={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
+          >
+            {isFullscreen ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
+          </button>
+
           <button
             onClick={handleRun}
-            className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-semibold text-foreground transition-all hover:bg-hover-row cursor-pointer"
+            disabled={isRunning}
+            className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-semibold text-foreground transition-all hover:bg-hover-row disabled:opacity-50 cursor-pointer"
           >
-            <Play className="h-3 w-3" /> Run
+            <Play className="h-3 w-3" /> {isRunning ? "Running..." : "Run"}
           </button>
           <button
             onClick={handleSubmit}
             disabled={isSubmitting}
             className="rounded-md bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground transition-all hover:opacity-90 disabled:opacity-50 cursor-pointer"
           >
-            {isSubmitting ? "Submitting..." : "Submit"}
+            {isSubmitting ? "Judging..." : "Submit"}
           </button>
         </div>
       </header>
@@ -266,7 +343,7 @@ function ProblemPage() {
         <div className="flex flex-col bg-code-bg overflow-hidden relative">
           <div className="flex-1 flex overflow-hidden">
             {/* Editor Line Numbers */}
-            <div className="py-6 px-3 bg-code-bg text-right font-mono text-[13px] text-muted-foreground/40 select-none border-r border-border/10 leading-6 min-w-[3rem]">
+            <div className="py-6 px-3 bg-code-bg text-right font-mono text-muted-foreground/40 select-none border-r border-border/10 min-w-[3rem]" style={{ fontSize: `${fontSize}px`, lineHeight: "1.6" }}>
               {lines.map((_, idx) => (
                 <div key={idx}>{idx + 1}</div>
               ))}
@@ -276,19 +353,18 @@ function ProblemPage() {
             <textarea
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              className="flex-1 py-6 px-4 bg-transparent font-mono text-[13px] leading-6 text-foreground outline-none resize-none overflow-y-auto h-full"
+              className="flex-1 py-6 px-4 bg-transparent font-mono text-foreground outline-none resize-none overflow-y-auto h-full"
+              style={{ fontSize: `${fontSize}px`, lineHeight: "1.6" }}
               spellCheck="false"
             />
           </div>
 
-          {/* Test results overlay */}
+          {/* Test results panel with individual case results */}
           {showResults && (
-            <div className="border-t border-border bg-background px-6 py-5 animate-in slide-in-from-bottom-4 duration-200">
-              <div className="flex items-center justify-between">
+            <div className="border-t border-border bg-background px-6 py-5 animate-in slide-in-from-bottom-4 duration-200 max-h-[40%] overflow-y-auto">
+              <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2 text-sm">
-                  <span className="h-2 w-2 rounded-full bg-success animate-pulse" />
-                  <span className="text-success font-semibold">Accepted</span>
-                  <span className="text-muted-foreground">· 3/3 tests passed · 42 ms</span>
+                  <span className="text-success font-semibold">✓ {testResults.filter(r => r.verdict === "AC").length}/{testResults.length} tests passed</span>
                 </div>
                 <button
                   onClick={() => setShowResults(false)}
@@ -297,30 +373,49 @@ function ProblemPage() {
                   Close
                 </button>
               </div>
-              <div className="mt-4 grid grid-cols-2 gap-4 font-mono text-[12px]">
-                <div>
-                  <div className="text-xs text-muted-foreground mb-1">Expected Output</div>
-                  <div className="rounded-lg bg-context-bar px-3 py-2 text-foreground border border-border">1</div>
-                </div>
-                <div>
-                  <div className="text-xs text-muted-foreground mb-1">Your Output</div>
-                  <div className="rounded-lg bg-context-bar px-3 py-2 text-foreground border border-border">1</div>
-                </div>
+              <div className="space-y-3">
+                {testResults.map((r) => (
+                  <div key={r.id} className="rounded-lg border border-border p-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs font-semibold ${verdictColor[r.verdict]}`}>
+                          {r.verdict === "AC" ? <CheckCircle2 className="inline h-3.5 w-3.5 mr-1" /> : <XCircle className="inline h-3.5 w-3.5 mr-1" />}
+                          Case {r.id}: {verdictLabel[r.verdict]}
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-muted-foreground font-mono">{r.time} · {r.memory}</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-3 font-mono text-[11px]">
+                      <div>
+                        <div className="text-[10px] text-muted-foreground mb-0.5">Input</div>
+                        <div className="rounded bg-context-bar px-2 py-1 text-foreground border border-border truncate">{r.input}</div>
+                      </div>
+                      <div>
+                        <div className="text-[10px] text-muted-foreground mb-0.5">Expected</div>
+                        <div className="rounded bg-context-bar px-2 py-1 text-foreground border border-border">{r.expected}</div>
+                      </div>
+                      <div>
+                        <div className="text-[10px] text-muted-foreground mb-0.5">Output</div>
+                        <div className={`rounded px-2 py-1 border ${r.verdict === "AC" ? "bg-success/5 border-success/20 text-success" : "bg-danger/5 border-danger/20 text-danger"}`}>{r.actual}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
 
-          {/* Submission feedback overlay */}
-          {submitResult === "success" && (
+          {/* Submission verdict overlay */}
+          {submitResult && (
             <div className="border-t border-border bg-background px-6 py-6 animate-in slide-in-from-bottom-4 duration-200">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-success/15 text-success">
-                    <Check className="h-4 w-4" />
+                <div className="flex items-center gap-3">
+                  <div className={`flex h-8 w-8 items-center justify-center rounded-full ${submitResult.verdict === "AC" ? "bg-success/15 text-success" : "bg-danger/15 text-danger"}`}>
+                    {submitResult.verdict === "AC" ? <Check className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
                   </div>
                   <div>
-                    <h4 className="text-sm font-semibold text-foreground">All Test Cases Passed!</h4>
-                    <p className="text-xs text-muted-foreground">Successfully submitted to production server.</p>
+                    <h4 className={`text-sm font-semibold ${verdictColor[submitResult.verdict]}`}>{verdictLabel[submitResult.verdict]}</h4>
+                    <p className="text-xs text-muted-foreground">{submitResult.details}</p>
                   </div>
                 </div>
                 <button
@@ -330,11 +425,13 @@ function ProblemPage() {
                   Dismiss
                 </button>
               </div>
-              <div className="mt-4 flex gap-6 font-mono text-[11px] text-muted-foreground bg-muted/20 p-3 rounded-lg border border-border">
-                <div>Runtime: <span className="text-foreground font-semibold">32 ms (Top 94%)</span></div>
-                <div>Memory: <span className="text-foreground font-semibold">16.4 MB (Top 88%)</span></div>
-                <div>Points: <span className="text-foreground font-semibold">+100 XP</span></div>
-              </div>
+              {submitResult.verdict === "AC" && (
+                <div className="mt-4 flex gap-6 font-mono text-[11px] text-muted-foreground bg-muted/20 p-3 rounded-lg border border-border">
+                  <div>Runtime: <span className="text-foreground font-semibold">32 ms (Top 94%)</span></div>
+                  <div>Memory: <span className="text-foreground font-semibold">16.4 MB (Top 88%)</span></div>
+                  <div>Points: <span className="text-foreground font-semibold">+100 XP</span></div>
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -79,14 +79,14 @@ function Teacher() {
                   <span className="flex items-center gap-2"><Plus className="h-3.5 w-3.5" /> Create question</span>
                   <ArrowRight className="h-3.5 w-3.5 opacity-0 transition-opacity group-hover:opacity-100" />
                 </Link>
-                <button className="group flex items-center justify-between border-b border-border py-2 text-foreground">
+                <Link to="/teacher/contests/new" className="group flex items-center justify-between border-b border-border py-2 text-foreground">
                   <span className="flex items-center gap-2"><Plus className="h-3.5 w-3.5" /> Create contest</span>
                   <ArrowRight className="h-3.5 w-3.5 opacity-0 transition-opacity group-hover:opacity-100" />
-                </button>
-                <button className="group flex items-center justify-between border-b border-border py-2 text-foreground">
+                </Link>
+                <Link to="/teacher/upload" className="group flex items-center justify-between border-b border-border py-2 text-foreground">
                   <span className="flex items-center gap-2"><ArrowUp className="h-3.5 w-3.5" /> Bulk upload</span>
                   <ArrowRight className="h-3.5 w-3.5 opacity-0 transition-opacity group-hover:opacity-100" />
-                </button>
+                </Link>
               </div>
             </section>
             <section className="rounded-md border border-danger/30 bg-danger/5 p-5">

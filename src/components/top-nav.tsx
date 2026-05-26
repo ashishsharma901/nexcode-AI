@@ -13,7 +13,8 @@ const studentNav: NavItem[] = [
 ];
 
 const teacherNav: NavItem[] = [
-  { to: "/teacher", label: "Question bank" },
+  { to: "/teacher", label: "Dashboard" },
+  { to: "/teacher/questions", label: "Question Bank" },
   { to: "/teacher/contests", label: "Contests" },
   { to: "/teacher/students", label: "Students" },
   { to: "/teacher/analytics", label: "Analytics" },
@@ -153,7 +154,7 @@ export function TopNav({ role = "student" }: { role?: "student" | "teacher" | "a
               <div className="absolute right-0 mt-2 w-80 rounded-xl border border-border bg-popover text-popover-foreground shadow-lg ring-1 ring-black/5 focus:outline-none animate-in fade-in slide-in-from-top-1 duration-150">
                 <div className="flex items-center justify-between border-b border-border px-4 py-3">
                   <span className="text-sm font-semibold">Notifications</span>
-                  <Link to="/notifications" onClick={() => setNotifOpen(false)} className="text-xs text-primary hover:underline">
+                  <Link to="/dashboard" onClick={() => setNotifOpen(false)} className="text-xs text-primary hover:underline">
                     View all
                   </Link>
                 </div>

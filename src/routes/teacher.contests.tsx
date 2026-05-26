@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
 import { TopNav, ContextBar } from "@/components/top-nav";
 import { useState } from "react";
 import { Plus, Search, Calendar, Users, Eye, Edit, Trash, Copy } from "lucide-react";
@@ -15,6 +15,9 @@ interface ContestItem {
 }
 
 function TeacherContests() {
+  const { pathname } = useLocation();
+  if (pathname !== "/teacher/contests") return <Outlet />;
+
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
   const [contests, setContests] = useState<ContestItem[]>([

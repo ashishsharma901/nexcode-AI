@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { Trophy, X, ArrowLeft, Play, Sparkles } from "lucide-react";
+import { Trophy, X, ArrowLeft, Play, Sparkles, Send } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/contest")({ component: Contest });
@@ -80,6 +80,27 @@ function Contest() {
   const [code, setCode] = useState(mockProblems[2].starterCode);
   const [isRunning, setIsRunning] = useState(false);
   const [runSuccess, setRunSuccess] = useState(false);
+
+  // Enter fullscreen on mount
+  useEffect(() => {
+    const enterFullscreen = async () => {
+      try {
+        if (document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen();
+        }
+      } catch {
+        // User may deny fullscreen — that's ok
+      }
+    };
+    enterFullscreen();
+
+    // Exit fullscreen on unmount (leaving contest)
+    return () => {
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      }
+    };
+  }, []);
 
   // Sync starter code when active problem changes
   useEffect(() => {
@@ -199,9 +220,18 @@ function Contest() {
               <button
                 onClick={handleRunCode}
                 disabled={isRunning}
-                className="rounded bg-white/10 hover:bg-white/15 px-3 py-1 text-white transition-all disabled:opacity-50 cursor-pointer"
+                className="rounded bg-white hover:bg-white/90 px-3 py-1.5 text-black font-semibold transition-all disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
               >
-                {isRunning ? "Running..." : "Run Test Cases"}
+                <Play className="h-3 w-3" />
+                {isRunning ? "Running..." : "Run"}
+              </button>
+              <button
+                onClick={handleRunCode}
+                disabled={isRunning}
+                className="rounded bg-orange-500 hover:bg-orange-600 px-4 py-1.5 text-white font-semibold transition-all disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
+              >
+                <Send className="h-3 w-3" />
+                Submit
               </button>
             </div>
           </div>

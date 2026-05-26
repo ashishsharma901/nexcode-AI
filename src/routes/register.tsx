@@ -1,25 +1,56 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { CheckCircle2 } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 export const Route = createFileRoute("/register")({ component: Register });
 
 function Register() {
+  const { register, error, clearError } = useAuth();
+  const navigate = useNavigate();
   const [role, setRole] = useState<"student" | "teacher">("student");
   const [success, setSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     rollNumber: "",
     employeeId: "",
-    department: "Computer Science",
+    department: "CSE",
     year: "1",
     password: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSuccess(true);
+    clearError();
+    setSubmitting(true);
+
+    const result = await register({
+      email: formData.email,
+      password: formData.password,
+      name: formData.name,
+      role,
+      departmentCode: formData.department,
+      rollNumber: role === "student" ? formData.rollNumber : undefined,
+      year: role === "student" ? parseInt(formData.year) : undefined,
+      employeeId: role === "teacher" ? formData.employeeId : undefined,
+    });
+
+    setSubmitting(false);
+
+    if (result.success) {
+      if (result.message) {
+        // Teacher — needs approval
+        setSuccessMessage(result.message);
+        setSuccess(true);
+      } else {
+        // Student — auto-logged in, redirect
+        setSuccess(true);
+        setTimeout(() => navigate({ to: "/dashboard" }), 1500);
+      }
+    }
   };
 
   return (
@@ -65,8 +96,8 @@ function Register() {
               </h2>
               <p className="text-sm text-muted-foreground max-w-xs mx-auto leading-relaxed">
                 {role === "student"
-                  ? "Welcome to NexCode AI. Your account is ready. You can now log in."
-                  : "Teacher accounts require verification. Our admin staff will review your credentials shortly and email approval confirmation."}
+                  ? "Welcome to NexCode AI. Your account is ready. Redirecting to dashboard..."
+                  : successMessage || "Teacher accounts require verification. Our admin staff will review your credentials shortly."}
               </p>
               <div className="pt-4">
                 <Link
@@ -152,10 +183,10 @@ function Register() {
                           onChange={(e) => setFormData({ ...formData, department: e.target.value })}
                           className="mt-1 w-full border-0 border-b border-border bg-transparent py-2 text-sm text-foreground outline-none transition-colors focus:border-primary cursor-pointer"
                         >
-                          <option className="bg-popover text-foreground" value="Computer Science">CSE</option>
-                          <option className="bg-popover text-foreground" value="Information Tech">IT</option>
-                          <option className="bg-popover text-foreground" value="Electrical Eng">ECE</option>
-                          <option className="bg-popover text-foreground" value="Mechanical Eng">ME</option>
+                          <option className="bg-popover text-foreground" value="CSE">CSE</option>
+                          <option className="bg-popover text-foreground" value="IT">IT</option>
+                          <option className="bg-popover text-foreground" value="ECE">ECE</option>
+                          <option className="bg-popover text-foreground" value="ME">ME</option>
                         </select>
                       </div>
                       <div>
@@ -207,9 +238,9 @@ function Register() {
                         onChange={(e) => setFormData({ ...formData, department: e.target.value })}
                         className="mt-1 w-full border-0 border-b border-border bg-transparent py-2 text-sm text-foreground outline-none transition-colors focus:border-primary cursor-pointer"
                       >
-                        <option className="bg-popover text-foreground" value="Computer Science">Computer Science & Engineering</option>
-                        <option className="bg-popover text-foreground" value="Information Technology">Information Technology</option>
-                        <option className="bg-popover text-foreground" value="Electrical Engineering">Electronics & Comm Engineering</option>
+                        <option className="bg-popover text-foreground" value="CSE">Computer Science & Engineering</option>
+                        <option className="bg-popover text-foreground" value="IT">Information Technology</option>
+                        <option className="bg-popover text-foreground" value="ECE">Electronics & Comm Engineering</option>
                       </select>
                     </div>
                   </>
@@ -233,11 +264,18 @@ function Register() {
                   </div>
                 )}
 
+                {error && (
+                  <div className="rounded-lg bg-danger/10 border border-danger/20 px-3 py-2 text-xs text-danger">
+                    {error}
+                  </div>
+                )}
+
                 <button
                   type="submit"
-                  className="block w-full rounded-full bg-primary px-6 py-3 text-center text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 cursor-pointer pt-3"
+                  disabled={submitting}
+                  className="block w-full rounded-full bg-primary px-6 py-3 text-center text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 cursor-pointer pt-3 disabled:opacity-50"
                 >
-                  Create account
+                  {submitting ? "Creating account..." : "Create account"}
                 </button>
               </form>
 

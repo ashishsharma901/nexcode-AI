@@ -1,11 +1,38 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { useAuth } from "@/lib/auth-context";
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
 function Index() {
+  const { user, login, error, clearError, loading } = useAuth();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("aarav@college.edu");
+  const [password, setPassword] = useState("student123");
+  const [submitting, setSubmitting] = useState(false);
+
+  // If already logged in, redirect
+  if (user) {
+    if (user.role === "admin") navigate({ to: "/admin" });
+    else if (user.role === "teacher") navigate({ to: "/teacher" });
+    else navigate({ to: "/dashboard" });
+    return null;
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    clearError();
+    setSubmitting(true);
+    const success = await login(email, password);
+    setSubmitting(false);
+    if (success) {
+      // useAuth sets user, the redirect above will trigger on re-render
+    }
+  };
+
   return (
     <main className="grid min-h-screen grid-cols-1 lg:grid-cols-[55fr_45fr]">
       {/* Illustration panel */}
@@ -41,12 +68,14 @@ function Index() {
           <h1 className="font-serif text-5xl leading-tight text-foreground">Welcome back.</h1>
           <p className="mt-3 text-sm text-muted-foreground">Sign in with your student or faculty account.</p>
 
-          <form className="mt-10 space-y-6">
+          <form onSubmit={handleSubmit} className="mt-10 space-y-6">
             <div>
               <label className="block text-xs text-muted-foreground">Email</label>
               <input
                 type="email"
-                defaultValue="aarav@college.edu"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
                 className="mt-1 w-full border-0 border-b border-border bg-transparent py-2 text-sm text-foreground outline-none transition-colors focus:border-primary"
               />
             </div>
@@ -54,16 +83,24 @@ function Index() {
               <label className="block text-xs text-muted-foreground">Password</label>
               <input
                 type="password"
-                defaultValue="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
                 className="mt-1 w-full border-0 border-b border-border bg-transparent py-2 text-sm text-foreground outline-none transition-colors focus:border-primary"
               />
             </div>
-            <Link
-              to="/dashboard"
-              className="block w-full rounded-full bg-primary px-6 py-3 text-center text-sm font-medium text-primary-foreground transition-opacity duration-150 hover:opacity-90"
+            {error && (
+              <div className="rounded-lg bg-danger/10 border border-danger/20 px-3 py-2 text-xs text-danger">
+                {error}
+              </div>
+            )}
+            <button
+              type="submit"
+              disabled={submitting || loading}
+              className="block w-full rounded-full bg-primary px-6 py-3 text-center text-sm font-medium text-primary-foreground transition-opacity duration-150 hover:opacity-90 disabled:opacity-50 cursor-pointer"
             >
-              Sign in
-            </Link>
+              {submitting ? "Signing in..." : "Sign in"}
+            </button>
             <div className="text-center space-y-2">
               <button type="button" className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline block w-full">
                 or continue with Google
@@ -76,6 +113,15 @@ function Index() {
               </div>
             </div>
           </form>
+
+          <div className="mt-12 rounded-lg border border-border/50 bg-muted/20 p-4">
+            <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider mb-2">Demo Accounts</p>
+            <div className="space-y-1 text-[11px] text-muted-foreground font-mono">
+              <p>Student: aarav@college.edu / student123</p>
+              <p>Teacher: dr.rao@college.edu / teacher123</p>
+              <p>Admin: admin@college.edu / admin123</p>
+            </div>
+          </div>
 
           <div className="mt-16 flex items-center justify-between text-xs text-muted-foreground border-t border-border/50 pt-6">
             <span>© nexcode-ai</span>
